@@ -309,6 +309,7 @@ createApp({
         const switchTrip = async (id) => {
             currentTripId.value = id;
             showTripMenu.value = false;
+            window.scrollTo(0, 0);
 
             if (!db) return;
 

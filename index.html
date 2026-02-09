@@ -181,16 +181,12 @@
 
         <!-- Header -->
         <header class="bg-white/80 backdrop-blur-md z-20 sticky top-0 border-b border-slate-100 pt-safe-top">
-            <div class="px-5 py-4 flex justify-between items-center">
+            <!-- Row 1: Menu, Title, Share -->
+            <div class="px-5 py-3 flex justify-between items-center bg-white/50 backdrop-blur-sm z-30 relative">
                 <div class="flex items-center gap-3 min-w-0 flex-1">
                     <button @click="showTripMenu = true"
-                        class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition active:scale-95 shrink-0">
+                        class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-white hover:shadow-sm hover:text-slate-800 transition active:scale-95 shrink-0">
                         <i class="ph-bold ph-list text-2xl"></i>
-                    </button>
-                    <!-- Share Button -->
-                    <button @click="shareTrip"
-                        class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition active:scale-95 shrink-0">
-                        <i class="ph-bold ph-share-network text-2xl"></i>
                     </button>
 
                     <!-- Destination & Weather Info -->
@@ -234,24 +230,35 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- View Switcher -->
-                <div class="flex bg-slate-100/80 p-1 rounded-xl shrink-0">
+                    <!-- Share Button (Moved to right) -->
+                    <button @click="shareTrip"
+                        class="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:bg-white hover:shadow-sm hover:text-slate-800 transition active:scale-95 shrink-0">
+                        <i class="ph-bold ph-share-network text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Row 2: View Switcher (Full Width) -->
+            <div class="px-4 pb-2">
+                <div class="flex bg-slate-100/80 p-1 rounded-xl w-full justify-between">
                     <button @click="viewMode = 'plan'"
                         :class="viewMode === 'plan' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
-                        class="p-2 rounded-lg transition-all"><i class="ph-bold ph-calendar-check text-lg"></i></button>
+                        class="flex-1 p-2 rounded-lg transition-all flex justify-center"><i
+                            class="ph-bold ph-calendar-check text-lg"></i></button>
                     <button @click="viewMode = 'locations'"
                         :class="viewMode === 'locations' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
-                        class="p-2 rounded-lg transition-all"><i class="ph-bold ph-star text-lg"></i></button>
+                        class="flex-1 p-2 rounded-lg transition-all flex justify-center"><i
+                            class="ph-bold ph-star text-lg"></i></button>
                     <button @click="viewMode = 'money'"
                         :class="viewMode === 'money' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-400 hover:text-slate-600'"
-                        class="p-2 rounded-lg transition-all"><i
+                        class="flex-1 p-2 rounded-lg transition-all flex justify-center"><i
                             class="ph-bold ph-currency-dollar text-lg"></i></button>
                     <div class="w-[1px] h-4 bg-slate-300 mx-1 self-center"></div>
                     <button @click="viewMode = 'translate'"
                         :class="viewMode === 'translate' ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-slate-400 hover:text-indigo-500'"
-                        class="p-2 rounded-lg transition-all"><i class="ph-bold ph-translate text-lg"></i></button>
+                        class="flex-1 p-2 rounded-lg transition-all flex justify-center"><i
+                            class="ph-bold ph-translate text-lg"></i></button>
                 </div>
             </div>
 
@@ -444,114 +451,178 @@
                                 <div class="bg-white rounded-2xl shadow-soft border border-slate-100 transition-all duration-300 overflow-hidden relative"
                                     :class="{'hover:shadow-lg hover:-translate-y-0.5': !isEditingItem(item)}">
 
-                                    <!-- Edit Header (Visible only when editing) -->
+                                    <!-- Edit Mode Card -->
                                     <div v-if="isEditingItem(item)"
-                                        class="bg-slate-50 border-b border-slate-100 p-2 flex justify-between items-center">
-                                        <span
-                                            class="text-[10px] font-bold text-slate-400 ml-2 uppercase tracking-wider">編輯行程</span>
-                                        <div class="flex gap-2">
+                                        class="bg-white rounded-2xl shadow-xl ring-2 ring-primary-500/20 p-4 space-y-4 relative z-20 m-[-1px]">
+
+                                        <!-- Header: Type & Time -->
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-24 shrink-0">
+                                                <label
+                                                    class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">時間</label>
+                                                <input v-model="item.time" type="time"
+                                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-lg font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-100 font-mono">
+                                            </div>
+                                            <div class="flex-1">
+                                                <label
+                                                    class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">類型</label>
+                                                <div class="flex bg-slate-50 p-1 rounded-lg border border-slate-200">
+                                                    <button v-for="type in ['spot', 'food', 'shop', 'transport']"
+                                                        :key="type" @click="item.type = type"
+                                                        class="flex-1 py-1 rounded text-lg transition-colors"
+                                                        :class="item.type === type ? 'bg-white shadow-sm scale-100' : 'opacity-40 hover:opacity-100'">
+                                                        <span v-if="type==='spot'">📍</span>
+                                                        <span v-else-if="type==='food'">🍴</span>
+                                                        <span v-else-if="type==='shop'">🛍️</span>
+                                                        <span v-else-if="type==='transport'">🚇</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Content -->
+                                        <div class="space-y-3">
+                                            <div>
+                                                <input v-model="item.title"
+                                                    class="w-full text-lg font-bold text-slate-800 placeholder:text-slate-300 border-b-2 border-slate-100 focus:border-primary-400 bg-transparent py-1 focus:outline-none transition-colors"
+                                                    placeholder="行程名稱...">
+                                            </div>
+
+                                            <!-- Location & Link -->
+                                            <div
+                                                class="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2 border border-slate-100 focus-within:border-primary-200 focus-within:bg-white transition-colors">
+                                                <i class="ph-bold ph-map-pin text-slate-400 shrink-0"></i>
+                                                <div class="flex-1 min-w-0 flex flex-col">
+                                                    <input v-model="item.location"
+                                                        class="text-sm font-medium bg-transparent focus:outline-none text-slate-700 w-full truncate"
+                                                        placeholder="地點名稱">
+                                                    <input v-model="item.link"
+                                                        class="text-[10px] text-slate-400 bg-transparent focus:outline-none w-full truncate font-mono"
+                                                        placeholder="http://地圖連結...">
+                                                </div>
+                                            </div>
+
+                                            <div class="relative">
+                                                <i
+                                                    class="ph-bold ph-notebook absolute top-2.5 left-3 text-slate-300"></i>
+                                                <textarea v-model="item.note"
+                                                    class="w-full bg-slate-50 rounded-xl py-2 pl-9 pr-3 text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary-100 resize-none min-h-[60px]"
+                                                    placeholder="備註 (票卷/訂位編號...)"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="flex items-center justify-between pt-2 border-t border-slate-50">
                                             <button @click="removeItem(item)"
-                                                class="flex items-center gap-1 px-3 py-1 bg-white text-red-500 rounded-lg border border-red-100 shadow-sm hover:bg-red-50 transition text-xs font-bold">
+                                                class="text-red-400 hover:text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1">
                                                 <i class="ph-bold ph-trash"></i> 刪除
                                             </button>
                                             <button @click="toggleEditItem(item)"
-                                                class="flex items-center gap-1 px-3 py-1 bg-primary-600 text-white rounded-lg shadow-md hover:bg-primary-700 transition text-xs font-bold">
+                                                class="bg-primary-600 text-white px-6 py-2 rounded-xl font-bold shadow-md shadow-primary-200 hover:bg-primary-700 transition active:scale-95 flex items-center gap-2">
                                                 <i class="ph-bold ph-check"></i> 完成
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div class="flex gap-3 p-1 pr-3 items-start relative">
+                                    <!-- View Mode Card -->
+                                    <div v-else
+                                        class="bg-white rounded-2xl shadow-soft border border-slate-100 transition-all duration-300 overflow-hidden relative h-full flex flex-col"
+                                        :class="{'hover:shadow-lg hover:-translate-y-0.5': !isEditingItem(item)}">
 
-                                        <!-- Edit Button (Visible only when NOT editing) -->
-                                        <div v-if="!isEditingItem(item)" class="absolute top-2 right-2 z-20">
-                                            <button @click="toggleEditItem(item)"
-                                                class="w-7 h-7 flex items-center justify-center text-slate-300 hover:text-primary-500 hover:bg-primary-50 rounded-lg transition">
-                                                <i class="ph-bold ph-pencil-simple"></i>
-                                            </button>
-                                        </div>
+                                        <div class="flex gap-3 p-1 pr-3 items-start relative">
 
-                                        <!-- Time & Type -->
-                                        <div
-                                            class="bg-slate-50 rounded-xl p-2 w-20 flex flex-col items-center justify-center gap-1 shrink-0 border border-slate-100 group-hover:border-primary-100 transition-colors self-start h-20">
-                                            <div v-if="isEditingItem(item)" class="w-full">
-                                                <input v-model="item.time" type="time"
-                                                    class="w-full h-7 text-center bg-white border border-slate-200 rounded text-sm font-bold text-slate-700 focus:outline-none p-0 font-mono">
-                                            </div>
-                                            <div v-else class="text-center">
-                                                <div class="text-[9px] text-slate-400 font-medium">{{
-                                                    getTimePeriod(item.time)
-                                                    }}</div>
-                                                <div class="text-lg font-black text-slate-700 font-mono leading-none">{{
-                                                    item.time || '--:--' }}</div>
+                                            <!-- Edit Button (Visible only when NOT editing) -->
+                                            <div v-if="!isEditingItem(item)" class="absolute top-2 right-2 z-20">
+                                                <button @click="toggleEditItem(item)"
+                                                    class="w-7 h-7 flex items-center justify-center text-slate-300 hover:text-primary-500 hover:bg-primary-50 rounded-lg transition">
+                                                    <i class="ph-bold ph-pencil-simple"></i>
+                                                </button>
                                             </div>
 
-                                            <select v-if="isEditingItem(item)" v-model="item.type"
-                                                class="w-full h-7 text-[10px] font-bold text-center bg-white border border-slate-200 rounded-md py-0 appearance-none focus:ring-0 text-slate-500">
-                                                <option value="spot">📍 景點</option>
-                                                <option value="food">🍴 美食</option>
-                                                <option value="shop">🛍️ 購物</option>
-                                                <option value="transport">🚇 交通</option>
-                                            </select>
-                                            <div v-else class="text-xl mt-1">
-                                                <span v-if="item.type==='spot'">📍</span>
-                                                <span v-else-if="item.type==='food'">🍴</span>
-                                                <span v-else-if="item.type==='shop'">🛍️</span>
-                                                <span v-else-if="item.type==='transport'">🚇</span>
-                                                <span v-else>📍</span>
-                                            </div>
-                                        </div>
-
-                                        <!-- Content -->
-                                        <div class="flex-1 py-2 min-w-0 flex flex-col justify-center pr-1">
-                                            <input v-if="isEditingItem(item)" v-model="item.activity"
-                                                class="block w-full font-bold text-slate-800 bg-transparent border-b border-dashed border-slate-300 p-0 focus:ring-0 text-base placeholder:text-slate-300 focus:border-primary-400 mb-1"
-                                                placeholder="行程名稱...">
-                                            <div v-else class="font-bold text-slate-800 text-base">{{ item.activity ||
-                                                '未命名行程'
-                                                }}</div>
-
-                                            <div class="flex flex-col gap-2 mt-1">
-                                                <div v-if="isEditingItem(item)"
-                                                    class="flex items-center gap-2 bg-slate-50 rounded-lg px-2 py-1 border border-transparent focus-within:bg-white focus-within:border-primary-200 transition-all">
-                                                    <i class="ph-fill ph-link text-slate-300 text-xs"></i>
-                                                    <input v-model="item.location"
-                                                        class="flex-1 text-xs font-medium text-slate-600 bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-300"
-                                                        placeholder="輸入地點 或 貼上網址">
+                                            <!-- Time & Type -->
+                                            <div
+                                                class="bg-slate-50 rounded-xl p-2 w-20 flex flex-col items-center justify-center gap-1 shrink-0 border border-slate-100 group-hover:border-primary-100 transition-colors self-start h-20">
+                                                <div v-if="isEditingItem(item)" class="w-full">
+                                                    <input v-model="item.time" type="time"
+                                                        class="w-full h-7 text-center bg-white border border-slate-200 rounded text-sm font-bold text-slate-700 focus:outline-none p-0 font-mono">
+                                                </div>
+                                                <div v-else class="text-center">
+                                                    <div class="text-[9px] text-slate-400 font-medium">{{
+                                                        getTimePeriod(item.time)
+                                                        }}</div>
+                                                    <div
+                                                        class="text-lg font-black text-slate-700 font-mono leading-none">
+                                                        {{
+                                                        item.time || '--:--' }}</div>
                                                 </div>
 
-                                                <a v-if="item.location && (!isEditingItem(item) || isUrl(item.location))"
-                                                    :href="getExternalMapLink(item.location)" target="_blank"
-                                                    class="relative z-10 flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all border group/btn w-full mt-1"
-                                                    :class="isUrl(item.location) ? 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100' : 'bg-primary-50 text-primary-700 border-primary-100 hover:bg-primary-100'">
-                                                    <div class="flex items-center gap-2 truncate pr-2">
-                                                        <i
-                                                            :class="isUrl(item.location) ? 'ph-bold ph-globe' : 'ph-bold ph-navigation-arrow'"></i>
-                                                        <span class="truncate">{{ isUrl(item.location) ? '開啟網頁連結' :
-                                                            `導航至:
-                                                            ${item.location}` }}</span>
-                                                    </div>
-                                                    <i class="ph-bold ph-arrow-right"></i>
-                                                </a>
+                                                <select v-if="isEditingItem(item)" v-model="item.type"
+                                                    class="w-full h-7 text-[10px] font-bold text-center bg-white border border-slate-200 rounded-md py-0 appearance-none focus:ring-0 text-slate-500">
+                                                    <option value="spot">📍 景點</option>
+                                                    <option value="food">🍴 美食</option>
+                                                    <option value="shop">🛍️ 購物</option>
+                                                    <option value="transport">🚇 交通</option>
+                                                </select>
+                                                <div v-else class="text-xl mt-1">
+                                                    <span v-if="item.type==='spot'">📍</span>
+                                                    <span v-else-if="item.type==='food'">🍴</span>
+                                                    <span v-else-if="item.type==='shop'">🛍️</span>
+                                                    <span v-else-if="item.type==='transport'">🚇</span>
+                                                    <span v-else>📍</span>
+                                                </div>
                                             </div>
 
-                                            <div v-if="isEditingItem(item) || item.note"
-                                                class="flex items-start gap-2 mt-2 pt-1"
-                                                :class="{'border-t border-slate-50': isEditingItem(item)}">
-                                                <i class="ph-bold ph-notebook text-slate-300 text-xs mt-1"></i>
-                                                <textarea v-if="isEditingItem(item)" v-model="item.note" rows="2"
-                                                    class="flex-1 text-xs text-slate-400 bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-200 resize-none leading-relaxed"
-                                                    placeholder="備註 (票卷/訂位)"></textarea>
-                                                <div v-else
-                                                    class="flex-1 text-xs text-slate-500 leading-relaxed whitespace-pre-wrap">
-                                                    {{
-                                                    item.note }}</div>
+                                            <!-- Content -->
+                                            <div class="flex-1 py-2 min-w-0 flex flex-col justify-center pr-1">
+                                                <input v-if="isEditingItem(item)" v-model="item.activity"
+                                                    class="block w-full font-bold text-slate-800 bg-transparent border-b border-dashed border-slate-300 p-0 focus:ring-0 text-base placeholder:text-slate-300 focus:border-primary-400 mb-1"
+                                                    placeholder="行程名稱...">
+                                                <div v-else class="font-bold text-slate-800 text-base">{{ item.activity
+                                                    ||
+                                                    '未命名行程'
+                                                    }}</div>
+
+                                                <div class="flex flex-col gap-2 mt-1">
+                                                    <div v-if="isEditingItem(item)"
+                                                        class="flex items-center gap-2 bg-slate-50 rounded-lg px-2 py-1 border border-transparent focus-within:bg-white focus-within:border-primary-200 transition-all">
+                                                        <i class="ph-fill ph-link text-slate-300 text-xs"></i>
+                                                        <input v-model="item.location"
+                                                            class="flex-1 text-xs font-medium text-slate-600 bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-300"
+                                                            placeholder="輸入地點 或 貼上網址">
+                                                    </div>
+
+                                                    <a v-if="item.location && (!isEditingItem(item) || isUrl(item.location))"
+                                                        :href="getExternalMapLink(item.location)" target="_blank"
+                                                        class="relative z-10 flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all border group/btn w-full mt-1"
+                                                        :class="isUrl(item.location) ? 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100' : 'bg-primary-50 text-primary-700 border-primary-100 hover:bg-primary-100'">
+                                                        <div class="flex items-center gap-2 truncate pr-2">
+                                                            <i
+                                                                :class="isUrl(item.location) ? 'ph-bold ph-globe' : 'ph-bold ph-navigation-arrow'"></i>
+                                                            <span class="truncate">{{ isUrl(item.location) ? '開啟網頁連結' :
+                                                                `導航至:
+                                                                ${item.location}` }}</span>
+                                                        </div>
+                                                        <i class="ph-bold ph-arrow-right"></i>
+                                                    </a>
+                                                </div>
+
+                                                <div v-if="isEditingItem(item) || item.note"
+                                                    class="flex items-start gap-2 mt-2 pt-1"
+                                                    :class="{'border-t border-slate-50': isEditingItem(item)}">
+                                                    <i class="ph-bold ph-notebook text-slate-300 text-xs mt-1"></i>
+                                                    <textarea v-if="isEditingItem(item)" v-model="item.note" rows="2"
+                                                        class="flex-1 text-xs text-slate-400 bg-transparent border-none p-0 focus:ring-0 placeholder:text-slate-200 resize-none leading-relaxed"
+                                                        placeholder="備註 (票卷/訂位)"></textarea>
+                                                    <div v-else
+                                                        class="flex-1 text-xs text-slate-500 leading-relaxed whitespace-pre-wrap">
+                                                        {{
+                                                        item.note }}</div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                            </div>
+                                </div>
                         </template>
 
                         <button @click="addItem"
