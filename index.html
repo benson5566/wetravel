@@ -456,20 +456,21 @@
                                         class="bg-white rounded-2xl shadow-xl ring-2 ring-primary-500/20 p-4 space-y-4 relative z-20 m-[-1px]">
 
                                         <!-- Header: Type & Time -->
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-24 shrink-0">
+                                        <div class="grid grid-cols-[7rem_1fr] gap-4 items-end">
+                                            <div>
                                                 <label
                                                     class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">時間</label>
                                                 <input v-model="item.time" type="time"
-                                                    class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-lg font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-100 font-mono">
+                                                    class="w-full h-12 bg-slate-50 border border-slate-200 rounded-xl px-2 text-xl font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-100 font-mono text-center appearance-none">
                                             </div>
-                                            <div class="flex-1">
+                                            <div>
                                                 <label
                                                     class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">類型</label>
-                                                <div class="flex bg-slate-50 p-1 rounded-lg border border-slate-200">
+                                                <div
+                                                    class="flex h-12 bg-slate-50 p-1 rounded-xl border border-slate-200 items-stretch">
                                                     <button v-for="type in ['spot', 'food', 'shop', 'transport']"
                                                         :key="type" @click="item.type = type"
-                                                        class="flex-1 py-1 rounded text-lg transition-colors"
+                                                        class="flex-1 rounded-lg flex items-center justify-center text-xl transition-colors"
                                                         :class="item.type === type ? 'bg-white shadow-sm scale-100' : 'opacity-40 hover:opacity-100'">
                                                         <span v-if="type==='spot'">📍</span>
                                                         <span v-else-if="type==='food'">🍴</span>
