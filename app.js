@@ -308,6 +308,7 @@ createApp({
 
         const switchTrip = async (id) => {
             currentTripId.value = id;
+            viewMode.value = 'plan'; // Reset view to plan
             showTripMenu.value = false;
             window.scrollTo(0, 0);
 
