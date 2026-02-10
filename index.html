@@ -716,14 +716,7 @@
                                 </div>
                         </template>
 
-                        <button @click="addItem"
-                            class="group flex items-center gap-3 text-sm font-bold text-stone-500 hover:text-primary-600 transition-colors pl-2 py-2 w-full mt-4">
-                            <div
-                                class="w-8 h-8 rounded-full border-2 border-dashed border-stone-300 flex items-center justify-center group-hover:border-primary-400 group-hover:bg-primary-50 transition-all">
-                                <i class="ph-bold ph-plus"></i>
-                            </div>
-                            <span>新增行程</span>
-                        </button>
+
                     </div>
                 </div>
 
@@ -732,7 +725,7 @@
                     <div class="flex justify-between items-start mb-4">
                         <div class="text-left">
                             <h2 class="text-2xl font-black text-stone-800 flex items-center gap-2">
-                                <i class="ph-duotone ph-star text-orange-400"></i> 口袋名單
+                                <img src="assets/bow_pink.png" class="w-8 h-8 object-contain" alt="Bow"> 口袋名單
                             </h2>
                             <p class="text-sm text-stone-500 pl-1">{{ isLocationsEditing ? '長押並拖曳可重新排序' : '蒐集想去的地點' }}
                             </p>
@@ -1114,22 +1107,58 @@
         </div>
 
         <!-- Floating Action Button (User Custom Button) -->
-        <div class="fixed bottom-6 right-6 z-50" v-if="viewMode === 'plan'">
+        <div class="fixed bottom-6 right-6 z-50" v-if="viewMode === 'plan' && !showSetupModal && !showTripMenu">
             <button @click="addItem"
-                class="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full shadow-glow flex items-center justify-center text-white hover:scale-110 transition-transform active:scale-95 relative group border-4 border-white/50">
+                class="w-14 h-14 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full shadow-glow flex items-center justify-center text-white hover:scale-110 transition-transform active:scale-95 relative group border-4 border-white/50">
                 <!-- Icon -->
-                <i class="ph-bold ph-plus text-4xl drop-shadow-md"></i>
+                <i class="ph-bold ph-plus text-2xl drop-shadow-md"></i>
 
                 <!-- Decoration -->
                 <img src="assets/bow_pink.png"
-                    class="absolute -top-2 -right-2 w-10 h-10 drop-shadow-md transform rotate-12 group-hover:rotate-0 transition-transform z-20"
+                    class="absolute -top-1.5 -right-1.5 w-7 h-7 drop-shadow-md transform rotate-12 group-hover:rotate-0 transition-transform z-20"
                     alt="Bow">
             </button>
         </div>
 
     </div><!-- /app -->
 
-    <script type="module" src="./app.js?v=14"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(registration => {
+                    console.log('SW registered: ', registration);
+
+                    // Check for updates
+                    registration.onupdatefound = () => {
+                        const installingWorker = registration.installing;
+                        installingWorker.onstatechange = () => {
+                            if (installingWorker.state === 'installed') {
+                                if (navigator.serviceWorker.controller) {
+                                    console.log('New content available, reloading...');
+                                    window.location.reload();
+                                } else {
+                                    console.log('Content cached for offline use.');
+                                }
+                            }
+                        };
+                    };
+                }).catch(registrationError => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+
+                // Listen for controller change (this happens when new SW takes over)
+                let refreshing;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (refreshing) return;
+                    window.location.reload();
+                    refreshing = true;
+                });
+            });
+        }
+    </script>
+
+
+    <script type="module" src="./app.js?v=15"></script>
 
     <script>
         setTimeout(() => {

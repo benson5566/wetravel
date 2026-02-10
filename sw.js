@@ -1,7 +1,7 @@
-const CACHE_NAME = 'wetravel-v14';
+const CACHE_NAME = 'wetravel-v15';
 const ASSETS = [
   './index.html',
-  './app.js?v=14',
+  './app.js?v=15',
   './manifest.json',
   'https://unpkg.com/vue@3/dist/vue.esm-browser.js',
 
