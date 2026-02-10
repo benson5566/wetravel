@@ -4,8 +4,8 @@
   "description": "兩人協作旅遊規劃 APP",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#fff0f7",
-  "theme_color": "#ED0D92",
+  "background_color": "#ffffff",
+  "theme_color": "#FF0000",
   "icons": [
     {
       "src": "./icon.png",

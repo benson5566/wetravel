@@ -52,25 +52,25 @@
                     },
                     colors: {
                         primary: {
-                            50: '#fff0f7',
-                            100: '#ffe4f0',
-                            200: '#F5A3C8', // User Pink
-                            300: '#f06ea9',
-                            400: '#f03e91',
-                            500: '#ED0D92', // User Red
-                            600: '#d6007e',
-                            700: '#b30069',
-                            800: '#900052',
-                            900: '#730040'
+                            50: '#fff0f0',
+                            100: '#ffdbdb',
+                            200: '#ffb8b8',
+                            300: '#ff8a8a',
+                            400: '#ff5252',
+                            500: '#FF0000', // Classic Red
+                            600: '#db0000',
+                            700: '#b80000',
+                            800: '#940000',
+                            900: '#7a0000'
                         },
                         hello: {
-                            blue: '#007FFF',   // Classic Blue
-                            yellow: '#E9CA01', // Bright Yellow
-                            black: '#0E000A',  // Deep Black
+                            blue: '#007FFF',   // Classic Overalls Blue
+                            yellow: '#FFCC00', // Classic Nose Yellow
+                            black: '#111111',  // Cartoon Outline Black
                         },
                         boxShadow: {
                             'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-                            'glow': '0 0 15px rgba(45, 212, 191, 0.3)',
+                            'glow': '0 0 15px rgba(255, 0, 0, 0.2)',
                         },
                         spacing: {
                             'safe-top': 'env(safe-area-inset-top)',
@@ -79,20 +79,21 @@
                     }
                 }
             }
+        }
 
         /* PWA Service Worker Registration */
-        if('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./sw.js')
-                        .then(reg => console.log('SW registered!', reg))
-                        .catch(err => console.log('SW failed', err));
-                });
-            }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW registered!', reg))
+                    .catch(err => console.log('SW failed', err));
+            });
+        }
     </script>
     <link rel="manifest" href="./manifest.json">
     <style>
         body {
-            background-color: #fff0f7;
+            background-color: #ffffff;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
         }
