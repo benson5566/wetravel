@@ -57,10 +57,10 @@ createApp({
         const days = ref([]);
         const savedLocations = ref([]);
         const expenses = ref([]);
-        const participants = ref(['熊', '班']);
-        const participantsStr = ref('熊, 班');
+        const participants = ref(['班', '熊']);
+        const participantsStr = ref('班, 熊');
         const exchangeRate = ref(0.215);
-        const newExpense = ref({ item: '', amount: '', payer: '熊' });
+        const newExpense = ref({ item: '', amount: '', payer: '班' });
 
         const isRateLoading = ref(false);
         const weather = ref({ temp: null, icon: 'ph-sun', code: 0, location: '', daily: [] });
@@ -121,8 +121,14 @@ createApp({
             }
         };
         const toggleEditItem = (item) => {
-            if (editingState.items[item.id]) delete editingState.items[item.id];
-            else editingState.items[item.id] = true;
+            if (editingState.items[item.id]) {
+                // 使用明確賦值而非 delete，確保 Vue reactive 能偵測變更
+                editingState.items[item.id] = false;
+                // 同時觸發儲存
+                nextTick(() => debouncedSave());
+            } else {
+                editingState.items[item.id] = true;
+            }
         };
         const isEditingItem = (item) => !!editingState.items[item.id];
         const addDay = () => days.value.push({ date: `Day ${days.value.length + 1}`, title: '', items: [] });
@@ -152,8 +158,8 @@ createApp({
         const createNewTrip = () => {
             setup.value = { destination: '', startDate: new Date().toISOString().split('T')[0], days: 5, rate: 1, currency: 'TWD', langCode: 'zh-TW', langName: '中文', mapProvider: 'google' };
             weather.value.location = '';
-            participantsStr.value = '熊, 班';
-            participants.value = ['熊', '班'];
+            participantsStr.value = '班, 熊';
+            participants.value = ['班', '熊'];
             isRateLoading.value = false;
             isEditing.value = false; showSetupModal.value = true; showTripMenu.value = false;
         };
@@ -249,8 +255,8 @@ createApp({
                 expenses.value = [];
                 savedLocations.value = [];
                 exchangeRate.value = setup.value.rate;
-                participantsStr.value = '熊, 班';
-                participants.value = ['熊', '班'];
+                participantsStr.value = '班, 熊';
+                participants.value = ['班', '熊'];
 
                 showSetupModal.value = false;
                 viewMode.value = 'plan';
@@ -351,7 +357,7 @@ createApp({
                     if (data.users) {
                         participantsStr.value = data.users;
                     } else {
-                        participantsStr.value = '熊, 班'; // Default for old data
+                        participantsStr.value = '班, 熊'; // Default for old data
                     }
                     updateParticipants();
 

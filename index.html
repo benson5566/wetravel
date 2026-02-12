@@ -231,6 +231,91 @@
 
 <body class="text-stone-600 h-screen flex flex-col overflow-hidden bg-stone-50">
 
+    <!-- Loading Splash Screen -->
+    <div id="loading-screen" style="
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background-color: #fff0f5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    ">
+        <img src="assets/BG_Loading.png" alt="Loading" style="
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+        ">
+        <p style="
+            position: relative;
+            z-index: 1;
+            color: #b88a8e;
+            font-size: 13px;
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+        ">© 2024 Sanrio Co., Ltd.</p>
+        <div style="
+            position: relative;
+            z-index: 1;
+            width: 60%;
+            max-width: 260px;
+            height: 22px;
+            border-radius: 999px;
+            border: 2.5px solid #ff1493;
+            background: white;
+            overflow: hidden;
+            padding: 3px;
+            margin-bottom: 3rem;
+        ">
+            <div id="loading-bar" style="
+                height: 100%;
+                width: 0%;
+                border-radius: 999px;
+                background: linear-gradient(90deg, #ff69b4, #ff1493);
+                transition: width 2.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            "></div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes loadingBounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+
+    <script>
+        // Start loading bar animation after a brief moment
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const bar = document.getElementById('loading-bar');
+                if (bar) bar.style.width = '100%';
+            });
+        });
+        // Fade out and remove loading screen after 2.8 seconds
+        setTimeout(() => {
+            const screen = document.getElementById('loading-screen');
+            if (screen) {
+                screen.style.opacity = '0';
+                screen.style.visibility = 'hidden';
+                setTimeout(() => screen.remove(), 500);
+            }
+        }, 2800);
+    </script>
+
     <div id="app" v-cloak
         class="flex flex-col h-full w-full bg-white shadow-2xl relative sm:max-w-md sm:mx-auto sm:rounded-[2rem] sm:my-4 sm:h-[95vh] sm:border-[6px] sm:border-stone-200 overflow-hidden ring-1 ring-stone-900/5">
 
@@ -573,7 +658,7 @@
                                         <!-- Content -->
                                         <div class="space-y-3">
                                             <div>
-                                                <input v-model="item.title"
+                                                <input v-model="item.activity"
                                                     class="w-full text-lg font-bold text-stone-800 placeholder:text-stone-300 border-b-2 border-stone-100 focus:border-primary-400 bg-transparent py-1 focus:outline-none transition-colors"
                                                     placeholder="行程名稱...">
                                             </div>
@@ -832,17 +917,23 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-4 rounded-3xl border border-stone-100 shadow-soft">
+                    <div class="bg-white p-4 rounded-3xl border border-stone-100 shadow-soft" style="display: none;">
                         <div class="text-xs font-bold text-stone-500 mb-3 uppercase tracking-wider ml-1">Split Members
                         </div>
                         <div
-                            class="w-full text-sm bg-stone-50 rounded-xl px-4 py-3 border border-stone-200 font-medium text-stone-700 cursor-default">
-                            熊, 班
+                            class="w-full bg-stone-50 rounded-xl px-4 py-3 border border-stone-200 font-medium text-stone-700 cursor-default flex items-center gap-2">
+                            <img src="assets/icn_kitty.png" class="w-7 h-7 object-contain" alt="熊">
+                            <span class="text-stone-300">,</span>
+                            <img src="assets/icn_danial.png" class="w-7 h-7 object-contain" alt="班">
                         </div>
                         <div class="grid grid-cols-2 gap-3 mt-4">
                             <div v-for="p in participants" :key="p"
                                 class="bg-stone-50 p-3 rounded-2xl border border-stone-100 flex items-center justify-between">
-                                <span class="text-xs font-bold text-stone-500">{{ p }}</span>
+                                <img v-if="p === '熊'" src="assets/icn_kitty.png" style="width:2.5rem;height:2.5rem"
+                                    class="object-contain" :alt="p">
+                                <img v-else-if="p === '班'" src="assets/icn_danial.png"
+                                    style="width:2.5rem;height:2.5rem" class="object-contain" :alt="p">
+                                <span v-else class="text-xs font-bold text-stone-500">{{ p }}</span>
                                 <span class="text-sm font-black text-primary-600">{{ currencySymbol }}{{
                                     paidByPerson[p]?.toLocaleString() || 0 }}</span>
                             </div>
@@ -883,8 +974,14 @@
                             class="flex justify-between items-center bg-white p-4 rounded-2xl border border-stone-100 shadow-sm hover:shadow-md transition-all">
                             <div class="flex items-center gap-4">
                                 <div
-                                    class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm font-black border border-indigo-100">
-                                    {{ exp.payer.charAt(0) }}</div>
+                                    class="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center border border-primary-100 overflow-hidden">
+                                    <img v-if="exp.payer === '熊'" src="assets/icn_kitty.png"
+                                        style="width:2.5rem;height:2.5rem" class="object-contain" alt="熊">
+                                    <img v-else-if="exp.payer === '班'" src="assets/icn_danial.png"
+                                        style="width:2.5rem;height:2.5rem" class="object-contain" alt="班">
+                                    <span v-else class="text-sm font-black text-primary-600">{{ exp.payer.charAt(0)
+                                        }}</span>
+                                </div>
                                 <div class="font-bold text-stone-700">{{ exp.item }}</div>
                             </div>
                             <div class="flex items-center gap-3">
@@ -911,34 +1008,39 @@
                     <div class="w-full max-w-sm space-y-4">
                         <a href="https://translate.google.com/?op=images" target="_blank" class="block w-full group">
                             <button
-                                class="w-full bg-white border border-stone-200 hover:border-orange-300 hover:shadow-lg hover:shadow-orange-500/10 text-stone-700 rounded-3xl p-6 transition-all duration-300 relative overflow-hidden">
-                                <div
-                                    class="absolute right-0 top-0 w-24 h-24 bg-orange-50 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-500">
+                                class="w-full bg-white border border-stone-200 rounded-3xl p-6 transition-all duration-300 relative overflow-hidden"
+                                style="border-color: #ff60b5; border-width: 1px;"
+                                onmouseover="this.style.boxShadow='0 10px 15px -3px rgba(255,96,181,0.1)'"
+                                onmouseout="this.style.boxShadow='none'">
+                                <div class="absolute right-0 top-0 w-24 h-24 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-500"
+                                    style="background-color: #F8DEEC">
                                 </div>
                                 <div class="relative z-10 flex items-center gap-4">
-                                    <div
-                                        class="w-12 h-12 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center">
+                                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center"
+                                        style="background-color: #F8DEEC">
                                         <img src="assets/icn_camera.png" class="w-8 h-8 object-contain" alt="Camera">
                                     </div>
                                     <div class="text-left">
                                         <div class="text-lg font-bold text-stone-800">拍照翻譯</div>
                                         <div class="text-xs text-stone-500">菜單 / 路牌 / 說明書</div>
                                     </div>
-                                    <i
-                                        class="ph-bold ph-caret-right ml-auto text-stone-300 group-hover:text-orange-400"></i>
+                                    <i class="ph-bold ph-caret-right ml-auto text-stone-300" style="color: #ff60b5"></i>
                                 </div>
                             </button>
                         </a>
                         <a :href="`https://translate.google.com/?sl=zh-TW&tl=${setup.langCode}&op=translate`"
                             target="_blank" class="block w-full group">
                             <button
-                                class="w-full bg-white border border-stone-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10 text-stone-700 rounded-3xl p-6 transition-all duration-300 relative overflow-hidden">
-                                <div
-                                    class="absolute right-0 top-0 w-24 h-24 bg-blue-50 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-500">
+                                class="w-full bg-white border border-stone-200 rounded-3xl p-6 transition-all duration-300 relative overflow-hidden"
+                                style="border-color: #ff60b5; border-width: 1px;"
+                                onmouseover="this.style.boxShadow='0 10px 15px -3px rgba(255,96,181,0.1)'"
+                                onmouseout="this.style.boxShadow='none'">
+                                <div class="absolute right-0 top-0 w-24 h-24 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-500"
+                                    style="background-color: #F8DEEC">
                                 </div>
                                 <div class="relative z-10 flex items-center gap-4">
-                                    <div
-                                        class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center">
+                                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center"
+                                        style="background-color: #F8DEEC">
                                         <img src="assets/icn_speak.png" class="w-8 h-8 object-contain" alt="Speak">
                                     </div>
                                     <div class="text-left">
@@ -947,21 +1049,23 @@
                                         </div>
                                         <div class="text-xs text-stone-500">我說話，翻譯給對方聽</div>
                                     </div>
-                                    <i
-                                        class="ph-bold ph-caret-right ml-auto text-stone-300 group-hover:text-blue-400"></i>
+                                    <i class="ph-bold ph-caret-right ml-auto text-stone-300" style="color: #ff60b5"></i>
                                 </div>
                             </button>
                         </a>
                         <a :href="`https://translate.google.com/?sl=${setup.langCode}&tl=zh-TW&op=translate`"
                             target="_blank" class="block w-full group">
                             <button
-                                class="w-full bg-white border border-stone-200 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-500/10 text-stone-700 rounded-3xl p-6 transition-all duration-300 relative overflow-hidden">
-                                <div
-                                    class="absolute right-0 top-0 w-24 h-24 bg-indigo-50 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-500">
+                                class="w-full bg-white border border-stone-200 rounded-3xl p-6 transition-all duration-300 relative overflow-hidden"
+                                style="border-color: #ff60b5; border-width: 1px;"
+                                onmouseover="this.style.boxShadow='0 10px 15px -3px rgba(255,96,181,0.1)'"
+                                onmouseout="this.style.boxShadow='none'">
+                                <div class="absolute right-0 top-0 w-24 h-24 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-500"
+                                    style="background-color: #F8DEEC">
                                 </div>
                                 <div class="relative z-10 flex items-center gap-4">
-                                    <div
-                                        class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center">
+                                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center"
+                                        style="background-color: #F8DEEC">
                                         <img src="assets/icn_listen.png" class="w-8 h-8 object-contain" alt="Listen">
                                     </div>
                                     <div class="text-left">
@@ -969,8 +1073,7 @@
                                                 class="ph-bold ph-arrow-right text-xs mx-1"></i> 中文</div>
                                         <div class="text-xs text-stone-500">對方說話，翻譯給我聽</div>
                                     </div>
-                                    <i
-                                        class="ph-bold ph-caret-right ml-auto text-stone-300 group-hover:text-indigo-400"></i>
+                                    <i class="ph-bold ph-caret-right ml-auto text-stone-300" style="color: #ff60b5"></i>
                                 </div>
                             </button>
                         </a>
@@ -997,16 +1100,21 @@
                     </button>
                     <div class="flex-1 overflow-y-auto space-y-3 hide-scroll">
                         <div v-for="trip in tripList" :key="trip.id" @click="switchTrip(trip.id)"
-                            class="p-4 rounded-2xl border transition-all cursor-pointer relative group"
-                            :class="currentTripId === trip.id ? 'bg-stone-800 border-stone-800 text-white shadow-lg' : 'bg-white border-stone-100 hover:border-primary-200 hover:shadow-md'">
-                            <div class="font-bold text-lg"
-                                :class="currentTripId === trip.id ? 'text-white' : 'text-stone-800'">{{ trip.destination
-                                || '未命名行程' }}</div>
-                            <div class="text-xs mt-1 font-medium"
-                                :class="currentTripId === trip.id ? 'text-stone-500' : 'text-stone-500'">{{
-                                trip.startDate }} • {{ trip.daysCount }} 天</div>
+                            class="p-4 rounded-2xl border transition-all cursor-pointer relative group overflow-hidden"
+                            :class="currentTripId === trip.id ? 'border-transparent text-white shadow-lg' : 'bg-white border-stone-100 hover:border-primary-200 hover:shadow-md'">
+                            <img v-if="currentTripId === trip.id" src="assets/kitty_pilot.png"
+                                class="absolute inset-0 w-full h-full object-cover pointer-events-none z-0" alt="">
+                            <div class="relative z-10">
+                                <div class="font-bold text-lg"
+                                    :class="currentTripId === trip.id ? 'text-white' : 'text-stone-800'">{{
+                                    trip.destination
+                                    || '未命名行程' }}</div>
+                                <div class="text-xs mt-1 font-medium"
+                                    :class="currentTripId === trip.id ? 'text-white/70' : 'text-stone-500'">{{
+                                    trip.startDate }} • {{ trip.daysCount }} 天</div>
+                            </div>
                             <button v-if="tripList.length > 1" @click.stop="deleteTrip(trip.id)"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg text-stone-300 hover:bg-red-50 hover:text-red-500 transition opacity-0 group-hover:opacity-100"><i
+                                class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg text-stone-300 hover:bg-red-50 hover:text-red-500 transition opacity-0 group-hover:opacity-100 z-10"><i
                                     class="ph-bold ph-trash"></i></button>
                         </div>
                     </div>
@@ -1158,7 +1266,7 @@
     </script>
 
 
-    <script type="module" src="./app.js?v=15"></script>
+    <script type="module" src="./app.js?v=16"></script>
 
     <script>
         setTimeout(() => {

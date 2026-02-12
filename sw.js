@@ -1,27 +1,56 @@
-const CACHE_NAME = 'wetravel-v15';
+const CACHE_NAME = 'wetravel-v16';
 const ASSETS = [
   './index.html',
-  './app.js?v=15',
   './manifest.json',
-  'https://unpkg.com/vue@3/dist/vue.esm-browser.js',
-
   'https://unpkg.com/@phosphor-icons/web',
   'https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Sans+TC:wght@300;400;500;700&display=swap'
 ];
 
+// 不快取的網址模式（API、Firestore、動態資源）
+const NO_CACHE_PATTERNS = [
+  'firestore.googleapis.com',
+  'www.googleapis.com',
+  'identitytoolkit.googleapis.com',
+  'securetoken.googleapis.com',
+  'nominatim.openstreetmap.org',
+  'api.open-meteo.com',
+  'api.exchangerate-api.com',
+  'firebase',
+  'app.js'
+];
+
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // Force activate immediately
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil(clients.claim()); // Take control of all clients immediately
+  // 清除舊版快取
+  event.waitUntil(
+    caches.keys().then(names =>
+      Promise.all(
+        names
+          .filter(name => name !== CACHE_NAME)
+          .map(name => caches.delete(name))
+      )
+    ).then(() => clients.claim())
+  );
 });
 
 self.addEventListener('fetch', (event) => {
+  const url = event.request.url;
+
+  // 如果請求符合不快取的模式，直接走網路
+  const shouldSkipCache = NO_CACHE_PATTERNS.some(pattern => url.includes(pattern));
+  if (shouldSkipCache) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // 其餘靜態資源：快取優先，找不到再走網路
   event.respondWith(
     caches.match(event.request).then((response) => response || fetch(event.request))
   );
