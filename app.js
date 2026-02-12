@@ -156,21 +156,38 @@ createApp({
         };
 
         const createNewTrip = () => {
+            ignoreRemoteUpdate = true; // Prevent saving these resets to the current trip
+            isEditing.value = false;
+            showSetupModal.value = true;
+            showTripMenu.value = false;
             setup.value = { destination: '', startDate: new Date().toISOString().split('T')[0], days: 5, rate: 1, currency: 'TWD', langCode: 'zh-TW', langName: '中文', mapProvider: 'google' };
             weather.value.location = '';
             participantsStr.value = '班, 熊';
             participants.value = ['班', '熊'];
             isRateLoading.value = false;
-            isEditing.value = false; showSetupModal.value = true; showTripMenu.value = false;
+            nextTick(() => ignoreRemoteUpdate = false);
         };
+
+        let setupSnapshot = null;
 
         const openEditModal = () => {
             const currentTrip = tripList.value.find(t => t.id === currentTripId.value);
             if (currentTrip) setup.value.destination = currentTrip.destination;
             setup.value.days = days.value.length;
             if (days.value.length > 0 && days.value[0].fullDate) setup.value.startDate = days.value[0].fullDate;
+            setupSnapshot = JSON.parse(JSON.stringify(setup.value));
             isRateLoading.value = false;
             isEditing.value = true; showSetupModal.value = true;
+        };
+
+        const cancelSetupModal = () => {
+            if (isEditing.value && setupSnapshot) {
+                ignoreRemoteUpdate = true;
+                setup.value = JSON.parse(JSON.stringify(setupSnapshot));
+                nextTick(() => ignoreRemoteUpdate = false);
+            }
+            setupSnapshot = null;
+            showSetupModal.value = false;
         };
 
         const initTrip = () => {
@@ -427,7 +444,7 @@ createApp({
         };
 
         watch([days, expenses, savedLocations, exchangeRate, participantsStr, setup], () => {
-            if (!ignoreRemoteUpdate) debouncedSave();
+            if (!ignoreRemoteUpdate && !(showSetupModal.value && !isEditing.value)) debouncedSave();
         }, { deep: true });
 
         watch(() => weather.value.location, () => {
@@ -499,7 +516,7 @@ createApp({
             weather, getTimePeriod,
             updateDate, showSetupModal, setup, initTrip, weatherDisplay, detectRate, isRateLoading, currencyLabel, currencySymbol, toggleFlightCard, getDotColor,
             showTripMenu, tripList, createNewTrip, switchTrip, deleteTrip, currentTripId,
-            openEditModal, isEditing, mapProviderLabel, amountInputRef, isAmountInvalid, isUrl,
+            openEditModal, cancelSetupModal, isEditing, mapProviderLabel, amountInputRef, isAmountInvalid, isUrl,
             editingState, toggleEditItem, isEditingItem,
             savedLocations, addSavedLocation, removeSavedLocation,
             updateRateByCurrency,
