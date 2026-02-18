@@ -37,6 +37,8 @@ createApp({
         const syncStatus = ref('synced');
         const shareUrl = ref('');
         const showShareModal = ref(false);
+        const showJoinInput = ref(false);
+        const joinTripUrl = ref('');
 
         const errorMap = {
             'unavailable': '無法連線到伺服器，請檢查網路。',
@@ -175,6 +177,34 @@ createApp({
             participants.value = ['班', '熊'];
             isRateLoading.value = false;
             nextTick(() => ignoreRemoteUpdate = false);
+        };
+
+        const joinTrip = () => {
+            const input = joinTripUrl.value.trim();
+            if (!input) { alert('請貼上行程連結或 ID'); return; }
+            // 從 URL 中提取 tripId，或直接使用輸入值作為 ID
+            let tripId = input;
+            try {
+                const url = new URL(input);
+                const params = new URLSearchParams(url.search);
+                if (params.has('tripId')) tripId = params.get('tripId');
+            } catch (e) {
+                // 不是 URL 格式，直接當作 tripId 使用
+            }
+            if (!tripId) { alert('無法解析行程 ID'); return; }
+            // 檢查是否已存在
+            if (tripList.value.find(t => t.id === tripId)) {
+                switchTrip(tripId);
+                showJoinInput.value = false;
+                joinTripUrl.value = '';
+                return;
+            }
+            // 加入行程列表
+            tripList.value.unshift({ id: tripId, destination: '載入中...', startDate: '...', daysCount: 0 });
+            saveTripList();
+            switchTrip(tripId);
+            showJoinInput.value = false;
+            joinTripUrl.value = '';
         };
 
         let setupSnapshot = null;
@@ -532,7 +562,8 @@ createApp({
             toggleWeatherEdit, isWeatherEditing, updateWeatherLocation, weatherInputRef,
             isLocationsEditing, loadTripList,
             isDataLoading, isLoggedIn, dbError, dbErrorCode, dbErrorMessage, retryConnection, syncStatus,
-            shareTrip, showShareModal
+            shareTrip, showShareModal,
+            showJoinInput, joinTripUrl, joinTrip
         };
     }
 }).mount('#app')
