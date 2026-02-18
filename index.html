@@ -996,10 +996,34 @@
                             class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-600">
                             <i class="ph-duotone ph-translate text-4xl"></i>
                         </div>
-                        <h2 class="text-3xl font-black text-stone-800 mb-2">語言小幫手</h2>
+                        <h2 class="text-3xl font-black text-stone-800 mb-2">旅遊小幫手</h2>
                         <p class="text-sm text-stone-500 font-medium">在 {{ setup.destination || '國外' }} 旅遊，溝通無障礙</p>
                     </div>
                     <div class="w-full max-w-sm space-y-4">
+                        <!-- 旅遊助理 -->
+                        <a href="https://gemini.google.com/gem/fdc6770f6a29?usp=sharing" target="_blank"
+                            class="block w-full group">
+                            <button
+                                class="w-full bg-white border border-stone-200 rounded-3xl p-6 transition-all duration-300 relative overflow-hidden"
+                                style="border-color: #ff60b5; border-width: 1px;"
+                                onmouseover="this.style.boxShadow='0 10px 15px -3px rgba(255,96,181,0.1)'"
+                                onmouseout="this.style.boxShadow='none'">
+                                <div class="absolute right-0 top-0 w-24 h-24 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-500"
+                                    style="background-color: #F8DEEC">
+                                </div>
+                                <div class="relative z-10 flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center"
+                                        style="background-color: #F8DEEC">
+                                        <img src="assets/icn_agent.png" class="w-8 h-8 object-contain" alt="Agent">
+                                    </div>
+                                    <div class="text-left">
+                                        <div class="text-lg font-bold text-stone-800">旅遊助理</div>
+                                        <div class="text-xs text-stone-500">AI 智能旅遊規劃助手</div>
+                                    </div>
+                                    <i class="ph-bold ph-caret-right ml-auto text-stone-300" style="color: #ff60b5"></i>
+                                </div>
+                            </button>
+                        </a>
                         <a href="https://translate.google.com/?op=images" target="_blank" class="block w-full group">
                             <button
                                 class="w-full bg-white border border-stone-200 rounded-3xl p-6 transition-all duration-300 relative overflow-hidden"
