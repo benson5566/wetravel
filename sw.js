@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wetravel-v18';
+const CACHE_NAME = 'wetravel-v19';
 const ASSETS = [
   './index.html',
   './manifest.json',
@@ -20,6 +20,12 @@ const NO_CACHE_PATTERNS = [
   'app.js'
 ];
 
+// 需要 Network First 的檔案（確保每次開啟都拿最新版）
+const NETWORK_FIRST_PATTERNS = [
+  'index.html',
+  'manifest.json'
+];
+
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -37,6 +43,12 @@ self.addEventListener('activate', event => {
           .map(name => caches.delete(name))
       )
     ).then(() => clients.claim())
+      .then(() => {
+        // 通知所有客戶端（頁面）新版本已啟用，觸發重載
+        self.clients.matchAll({ type: 'window' }).then(clients => {
+          clients.forEach(client => client.postMessage({ type: 'SW_UPDATED' }));
+        });
+      })
   );
 });
 
@@ -46,11 +58,29 @@ self.addEventListener('fetch', (event) => {
   // 如果請求符合不快取的模式，直接走網路
   const shouldSkipCache = NO_CACHE_PATTERNS.some(pattern => url.includes(pattern));
   if (shouldSkipCache) {
-    event.respondWith(fetch(event.request));
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
     return;
   }
 
-  // 其餘靜態資源：快取優先，找不到再走網路
+  // index.html 和 manifest.json：Network First（優先拿最新版，離線時用快取）
+  const isNetworkFirst = NETWORK_FIRST_PATTERNS.some(pattern => url.includes(pattern));
+  if (isNetworkFirst) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // 拿到新版後更新快取
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // 其餘靜態資源（字體、圖示庫等）：快取優先，找不到再走網路
   event.respondWith(
     caches.match(event.request).then((response) => response || fetch(event.request))
   );

@@ -105,14 +105,7 @@
             }
         }
 
-        /* PWA Service Worker Registration */
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('SW registered!', reg))
-                    .catch(err => console.log('SW failed', err));
-            });
-        }
+        /* PWA Service Worker — 註冊移至頁面底部 */
     </script>
     <link rel="manifest" href="./manifest.json">
     <style>
@@ -1275,7 +1268,7 @@
                 navigator.serviceWorker.register('./sw.js').then(registration => {
                     console.log('SW registered: ', registration);
 
-                    // Check for updates
+                    // 偵測新版本安裝完成
                     registration.onupdatefound = () => {
                         const installingWorker = registration.installing;
                         installingWorker.onstatechange = () => {
@@ -1289,23 +1282,44 @@
                             }
                         };
                     };
+
+                    // iOS PWA 從背景恢復時主動檢查更新
+                    document.addEventListener('visibilitychange', () => {
+                        if (document.visibilityState === 'visible') {
+                            registration.update().catch(() => { });
+                        }
+                    });
+
+                    // 每 60 秒自動檢查更新（iOS PWA 不一定會自動檢查）
+                    setInterval(() => {
+                        registration.update().catch(() => { });
+                    }, 60 * 1000);
+
                 }).catch(registrationError => {
                     console.log('SW registration failed: ', registrationError);
                 });
 
-                // Listen for controller change (this happens when new SW takes over)
+                // 監聽 controller 變更（新 SW 接管時觸發）
                 let refreshing;
                 navigator.serviceWorker.addEventListener('controllerchange', () => {
                     if (refreshing) return;
                     window.location.reload();
                     refreshing = true;
                 });
+
+                // 監聽 SW 主動發送的更新通知
+                navigator.serviceWorker.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'SW_UPDATED') {
+                        console.log('SW sent update notification, reloading...');
+                        window.location.reload();
+                    }
+                });
             });
         }
     </script>
 
 
-    <script type="module" src="./app.js?v=16"></script>
+    <script type="module" src="./app.js?v=19"></script>
 
     <script>
         setTimeout(() => {
