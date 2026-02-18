@@ -107,7 +107,7 @@ createApp({
         const isUrl = (str) => { if (!str) return false; try { new URL(str); return true; } catch { return /^https?:\/\//i.test(str); } };
 
         const addItem = () => {
-            const newItem = { id: generateId(), time: '', type: 'spot', activity: '', location: '', note: '' };
+            const newItem = { id: generateId(), time: '', type: 'spot', activity: '', location: '', link: '', note: '' };
             currentDay.value.items.push(newItem);
             editingState.items[newItem.id] = true;
         };
@@ -124,6 +124,15 @@ createApp({
             if (editingState.items[item.id]) {
                 // 使用明確賦值而非 delete，確保 Vue reactive 能偵測變更
                 editingState.items[item.id] = false;
+                // 依時間排序（00:00-23:59 由上到下），無時間的排到最後
+                if (currentDay.value && currentDay.value.items) {
+                    currentDay.value.items.sort((a, b) => {
+                        if (!a.time && !b.time) return 0;
+                        if (!a.time) return 1;
+                        if (!b.time) return -1;
+                        return a.time.localeCompare(b.time);
+                    });
+                }
                 // 同時觸發儲存
                 nextTick(() => debouncedSave());
             } else {

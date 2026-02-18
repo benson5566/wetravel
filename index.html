@@ -767,16 +767,17 @@
                                                             placeholder="輸入地點 或 貼上網址">
                                                     </div>
 
-                                                    <a v-if="item.location && (!isEditingItem(item) || isUrl(item.location))"
-                                                        :href="getExternalMapLink(item.location)" target="_blank"
+                                                    <a v-if="(item.link || item.location) && !isEditingItem(item)"
+                                                        :href="getExternalMapLink(item.link || item.location)"
+                                                        target="_blank"
                                                         class="relative z-10 flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold transition-all border group/btn w-full mt-1"
-                                                        :class="isUrl(item.location) ? 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100' : 'bg-primary-50 text-primary-700 border-primary-100 hover:bg-primary-100'">
+                                                        :class="isUrl(item.link || item.location) ? 'bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100' : 'bg-primary-50 text-primary-700 border-primary-100 hover:bg-primary-100'">
                                                         <div class="flex items-center gap-2 truncate pr-2">
                                                             <i
-                                                                :class="isUrl(item.location) ? 'ph-bold ph-globe' : 'ph-bold ph-navigation-arrow'"></i>
-                                                            <span class="truncate">{{ isUrl(item.location) ? '開啟網頁連結' :
-                                                                `導航至:
-                                                                ${item.location}` }}</span>
+                                                                :class="isUrl(item.link || item.location) ? 'ph-bold ph-globe' : 'ph-bold ph-navigation-arrow'"></i>
+                                                            <span class="truncate">{{ isUrl(item.link || item.location)
+                                                                ? '開啟連結' :
+                                                                '開啟導航' }}</span>
                                                         </div>
                                                         <i class="ph-bold ph-arrow-right"></i>
                                                     </a>
