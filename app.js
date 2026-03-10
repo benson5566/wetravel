@@ -298,9 +298,12 @@ createApp({
                 });
             }
 
-            // 先清空資料，再切換旅程，避免舊資料被存入新旅程
+            // 防止舊旅程資料被存入新旅程
             ignoreRemoteUpdate = true;
+            // 取消舊旅程的待存檔計時器
+            if (timeout) { clearTimeout(timeout); timeout = null; }
 
+            // 先設定新旅程資料，再切換 ID
             days.value = newDays;
             expenses.value = [];
             savedLocations.value = [];
@@ -315,6 +318,12 @@ createApp({
 
             showSetupModal.value = false;
             viewMode.value = 'plan';
+
+            // 等 onSnapshot 初始化完成後，解除鎖定並將新旅程資料存入 Firestore
+            nextTick(() => {
+                ignoreRemoteUpdate = false;
+                debouncedSave();
+            });
         };
 
         const deleteTrip = async (id) => {
