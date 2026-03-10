@@ -168,6 +168,7 @@ createApp({
 
         const createNewTrip = () => {
             ignoreRemoteUpdate = true; // Prevent saving these resets to the current trip
+            if (timeout) { clearTimeout(timeout); timeout = null; } // 取消舊旅程待存檔
             isEditing.value = false;
             showSetupModal.value = true;
             showTripMenu.value = false;
@@ -494,7 +495,7 @@ createApp({
         }, { deep: true });
 
         watch(() => weather.value.location, () => {
-            if (!ignoreRemoteUpdate) debouncedSave();
+            if (!ignoreRemoteUpdate && !(showSetupModal.value && !isEditing.value)) debouncedSave();
         });
 
         const initAuth = async () => {
