@@ -298,25 +298,23 @@ createApp({
                 });
             }
 
+            // 先清空資料，再切換旅程，避免舊資料被存入新旅程
+            ignoreRemoteUpdate = true;
+
+            days.value = newDays;
+            expenses.value = [];
+            savedLocations.value = [];
+            exchangeRate.value = setup.value.rate;
+            participantsStr.value = '班, 熊';
+            participants.value = ['班', '熊'];
+
             tripList.value.unshift(newTripMeta);
             saveTripList();
 
-            // Fix: Switch ID first so watcher saves to the NEW trip, not the old one
-            // We manually update currentTripId and start the listener
             switchTrip(newId);
 
-            // Wait for next tick to ensure watcher picks up the new ID
-            nextTick(() => {
-                days.value = newDays;
-                expenses.value = [];
-                savedLocations.value = [];
-                exchangeRate.value = setup.value.rate;
-                participantsStr.value = '班, 熊';
-                participants.value = ['班', '熊'];
-
-                showSetupModal.value = false;
-                viewMode.value = 'plan';
-            });
+            showSetupModal.value = false;
+            viewMode.value = 'plan';
         };
 
         const deleteTrip = async (id) => {
